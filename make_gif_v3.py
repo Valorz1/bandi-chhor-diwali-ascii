@@ -1,11 +1,45 @@
-import math, random
+import math, os, random
 import pyfiglet
 from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageChops
 
+
+def find_font(font_name, bold=False):
+    candidates = []
+    base_names = [font_name, font_name.replace("SansMono", "Mono"), font_name.replace("SansMono", "Mono"), font_name.replace("Mono", "SansMono")]
+    if bold:
+        base_names = [name.replace(".ttf", "-Bold.ttf") if ".ttf" in name else name for name in base_names]
+    for base in base_names:
+        candidates.extend([
+            base,
+            os.path.join("/usr/share/fonts/truetype/dejavu", base),
+            os.path.join("/usr/share/fonts/truetype/liberation2", base),
+            os.path.join("C:\\Windows\\Fonts", base),
+            os.path.join("C:\\Windows\\Fonts", base.lower()),
+        ])
+    candidates.extend([
+        "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf",
+        "/usr/share/fonts/truetype/liberation2/LiberationMono-Regular.ttf",
+        "/usr/share/fonts/truetype/liberation2/LiberationMono-Bold.ttf",
+        "C:\\Windows\\Fonts\\CascadiaMono.ttf",
+        "C:\\Windows\\Fonts\\CascadiaCode.ttf",
+        "C:\\Windows\\Fonts\\consola.ttf",
+        "C:\\Windows\\Fonts\\consolab.ttf",
+    ])
+    seen = set()
+    for path in candidates:
+        if not path or path in seen:
+            continue
+        seen.add(path)
+        if os.path.exists(path):
+            return ImageFont.truetype(path, FS)
+    return ImageFont.load_default()
+
+
 random.seed(21)
 FS = 12
-FONT = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", FS)
-FONTB = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf", FS)
+FONT = find_font("DejaVuSansMono.ttf")
+FONTB = find_font("DejaVuSansMono-Bold.ttf", bold=True)
 CW = 7.25
 CH = 14
 PAD = 12
